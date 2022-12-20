@@ -1,0 +1,16 @@
+Description: skip test failing with openssl 1.1 while investigated by upstream
+Bug: https://github.com/socketry/nio4r/issues/194
+Author: Cédric Boutillier <boutil@debian.org>
+Last-Update: 2019-01-02
+
+--- a/spec/support/selectable_examples.rb
++++ b/spec/support/selectable_examples.rb
+@@ -45,7 +45,7 @@
+   let(:stream)   { pair.first }
+   let(:peer)     { pair.last }
+ 
+-  it "selects readable when the other end closes" do
++  xit "selects readable when the other end closes" do
+     monitor = selector.register(stream, :r)
+     unless is_tls13
+       expect(selector.select(1)).to be_nil

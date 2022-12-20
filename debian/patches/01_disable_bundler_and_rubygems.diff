@@ -1,0 +1,15 @@
+Description: Disable rubygems and bundler usage
+Author: Sruthi Chandran <srud@disroot.org>
+Forwarded: no
+Last-Update: 2018-05-01
+
+--- a/ext/nio4r/extconf.rb
++++ b/ext/nio4r/extconf.rb
+@@ -1,6 +1,6 @@
+ # frozen_string_literal: true
+ 
+-require "rubygems"
++#require "rubygems"
+ 
+ # Write a dummy Makefile on Windows because we use the pure Ruby implementation there
+ if Gem.win_platform?

@@ -1,0 +1,96 @@
+ruby-nio4r (2.5.8-deepin1) unstable; urgency=medium
+
+  * Rebuild
+
+ -- Deepin Packages Builder <packages@deepin.org>  Fri, 11 Nov 2022 18:04:43 +0800
+
+ruby-nio4r (2.5.8-1) unstable; urgency=medium
+
+  * Team upload.
+
+  [ Cédric Boutillier ]
+  * Update team name
+  * Add .gitattributes to keep unwanted files out of the source package
+
+  [ Debian Janitor ]
+  * Update watch file format version to 4.
+
+  [ Pirate Praveen ]
+  * New upstream version 2.5.8
+  * Bump Standards-Version to 4.6.0 (no changes needed)
+  * Bump debhelper compatibility level to 13
+  * Refresh patches
+  * Add rake-compiler and rubocop as build dependencies
+
+ -- Pirate Praveen <praveen@debian.org>  Tue, 14 Sep 2021 01:37:42 +0530
+
+ruby-nio4r (2.3.1-2) unstable; urgency=medium
+
+  * Team upload.
+
+  [ Utkarsh Gupta ]
+  * Add salsa-ci.yml
+
+  [ Debian Janitor ]
+  * Trim trailing whitespace.
+  * Use secure copyright file specification URI.
+  * Bump debhelper from old 11 to 12.
+  * Set debhelper-compat version in Build-Depends.
+  * Set upstream metadata fields: Bug-Database, Bug-Submit, Repository,
+    Repository-Browse.
+  * Update standards version to 4.5.0, no changes needed.
+
+  [ Pirate Praveen ]
+  * Bump minimum version of gem2deb to 1.0~
+
+ -- Pirate Praveen <praveen@debian.org>  Tue, 14 Jul 2020 00:02:48 +0530
+
+ruby-nio4r (2.3.1-1) unstable; urgency=medium
+
+  * Team upload
+  * Re-upload to unstable
+
+ -- Sruthi Chandran <srud@disroot.org>  Thu, 03 Jan 2019 21:33:36 +0530
+
+ruby-nio4r (2.3.1-1~exp1) experimental; urgency=medium
+
+  * Team upload
+  * New upstream version 2.3.1
+  * Bump Standards-Version to 4.3.0 (no changes needed)
+  * Disable failing test with openssl 1.1 about SSL socket as NIO selectable
+    stream
+  * Add patch to create larger keys in tests (Closes: #912245)
+
+ -- Cédric Boutillier <boutil@debian.org>  Wed, 02 Jan 2019 16:52:22 +0100
+
+ruby-nio4r (2.3.0-1) experimental; urgency=medium
+
+  * Team upload
+  * New upstream release
+
+ -- Sruthi Chandran <srud@disroot.org>  Tue, 01 May 2018 19:41:14 +0530
+
+ruby-nio4r (1.2.1-1) unstable; urgency=medium
+
+  * Team upload.
+  * New upstream.
+  * debian/patches/01_disable_bundler_and_rubygems.diff: refreshed.
+  * debian/control: update Standards-Version from 3.9.7 to 3.9.8 (no other
+    changes needed.)
+
+ -- Joost van Baal-Ilić <joostvb@debian.org>  Wed, 11 May 2016 05:29:15 +0200
+
+ruby-nio4r (1.1.0-1) unstable; urgency=medium
+
+  * Team upload.
+  * New upstream version 1.1.0.
+  * Bump Standards-Version to 3.9.6 (no changes).
+  * Remove libev-dev from Build-Depends, package has own patched version.
+
+ -- Hleb Valoshka <375gnu@gmail.com>  Sat, 27 Jun 2015 23:18:52 +0300
+
+ruby-nio4r (1.0.0-1) unstable; urgency=medium
+
+  * Initial release. (Closes: #756131)
+
+ -- Miguel Landaeta <nomadium@debian.org>  Fri, 01 Aug 2014 15:53:44 -0300

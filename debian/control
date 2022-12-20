@@ -1,0 +1,46 @@
+Source: ruby-nio4r
+Section: ruby
+Priority: optional
+Maintainer: Debian Ruby Team <pkg-ruby-extras-maintainers@lists.alioth.debian.org>
+Uploaders: Miguel Landaeta <nomadium@debian.org>
+Build-Depends: debhelper-compat (= 13),
+               gem2deb (>= 1.0~),
+               ruby-coveralls,
+               ruby-rspec,
+	       ruby-rspec-retry,
+               rake-compiler,
+               rubocop
+Standards-Version: 4.6.0
+Vcs-Git: https://salsa.debian.org/ruby-team/ruby-nio4r.git
+Vcs-Browser: https://salsa.debian.org/ruby-team/ruby-nio4r
+Homepage: https://github.com/socketry/nio4r
+Testsuite: autopkgtest-pkg-ruby
+XS-Ruby-Versions: all
+
+Package: ruby-nio4r
+Architecture: any
+XB-Ruby-Versions: ${ruby:Versions}
+Depends: ruby | ruby-interpreter,
+         ${misc:Depends},
+         ${shlibs:Depends}
+Description: Ruby library providing a selector API for monitoring IO objects
+ nio4r (New IO for Ruby) provides an abstract, cross-platform stateful
+ I/O selector API for Ruby. I/O selectors are the heart of
+ "reactor"-based event loops, and monitor multiple I/O objects for
+ various types of readiness, e.g. ready for reading or writing.
+ .
+ The most similar API provided by Ruby today is Kernel.select, however
+ the select API requires you to pass in arrays of all of the I/O
+ objects you're interested in every time. nio4r provides a more
+ object-oriented API that lets you register I/O objects with a selector
+ then handle them when they're selected for various types of events.
+ .
+ nio4r is modeled after the Java NIO API, but simplified for
+ ease-of-use.
+ .
+ Its goals are:
+ .
+  * Expose high-level interfaces for stateful IO selectors.
+  * Keep the API small to maximize both portability and performance across
+    many different OSes and Ruby VMs.
+  * Provide inherently thread-safe facilities for working with IO objects.
