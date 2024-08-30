@@ -1,8 +1,35 @@
-ruby-nio4r (2.5.8-deepin1) unstable; urgency=medium
+ruby-nio4r (2.7.3-1) unstable; urgency=medium
 
-  * Rebuild
+  * Team upload.
+  * New upstream release.
+  * Declare compliance with Debian Policy 4.7.0.
+  * Refresh patches.
+  * d/ruby-nio4r.{docs,examples}: removed, not available anymore.
 
- -- Deepin Packages Builder <packages@deepin.org>  Fri, 11 Nov 2022 18:04:43 +0800
+ -- Lucas Kanashiro <kanashiro@debian.org>  Thu, 08 Aug 2024 22:18:07 -0300
+
+ruby-nio4r (2.5.8-3) unstable; urgency=medium
+
+  * Team upload.
+
+  [ Debian Janitor ]
+  * Set upstream metadata fields: Bug-Database, Bug-Submit, Repository-Browse.
+  * Update standards version to 4.6.2, no changes needed.
+
+  [ Lucas Kanashiro ]
+  * d/control: runtime depends on ${ruby:Depends} instead of ruby interpreted
+    directly.
+  * d/copyright: update years of libev upstream copyright.
+  * d/control: do not require root to build.
+
+ -- Lucas Kanashiro <kanashiro@debian.org>  Thu, 23 Feb 2023 12:05:17 -0300
+
+ruby-nio4r (2.5.8-2) unstable; urgency=medium
+
+  * Team upload.
+  * Switch to gem-install layout for bundle --local compatibility
+
+ -- Pirate Praveen <praveen@debian.org>  Sat, 29 Jan 2022 02:45:00 +0530
 
 ruby-nio4r (2.5.8-1) unstable; urgency=medium
 

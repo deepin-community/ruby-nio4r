@@ -1,3 +1,1 @@
 01_disable_bundler_and_rubygems.diff
-03_skip_selectable_example_38.patch
-02_larger_key_for_tests.patch

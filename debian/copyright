@@ -7,7 +7,7 @@ Copyright: 2011-12 Tony Arcieri <bascule@gmail.com>
 License: Expat
 
 Files: ext/libev/*
-Copyright: 2007-2012 Marc Alexander Lehmann <libev@schmorp.de>
+Copyright: 2007-2013 Marc Alexander Lehmann <libev@schmorp.de>
 License: BSD-2-clause or GPL-2+
 
 Files: debian/*

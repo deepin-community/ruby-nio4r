@@ -8,8 +8,8 @@ static VALUE cNIO_ByteBuffer_MarkUnsetError = Qnil;
 
 /* Allocator/deallocator */
 static VALUE NIO_ByteBuffer_allocate(VALUE klass);
-static void NIO_ByteBuffer_gc_mark(struct NIO_ByteBuffer *byteBuffer);
-static void NIO_ByteBuffer_free(struct NIO_ByteBuffer *byteBuffer);
+static void NIO_ByteBuffer_free(void *data);
+static size_t NIO_ByteBuffer_memsize(const void *data);
 
 /* Methods */
 static VALUE NIO_ByteBuffer_initialize(VALUE self, VALUE capacity);
@@ -35,6 +35,26 @@ static VALUE NIO_ByteBuffer_each(VALUE self);
 static VALUE NIO_ByteBuffer_inspect(VALUE self);
 
 #define MARK_UNSET -1
+
+/* Compatibility for Ruby <= 3.1 */
+#ifndef HAVE_RB_IO_DESCRIPTOR
+static int
+io_descriptor_fallback(VALUE io)
+{
+    rb_io_t *fptr;
+    GetOpenFile(io, fptr);
+    return fptr->fd;
+}
+#define rb_io_descriptor io_descriptor_fallback
+#endif
+
+static void
+io_set_nonblock(VALUE io)
+{
+    rb_io_t *fptr;
+    GetOpenFile(io, fptr);
+    rb_io_set_nonblock(fptr);
+}
 
 void Init_NIO_ByteBuffer()
 {
@@ -72,28 +92,46 @@ void Init_NIO_ByteBuffer()
     rb_define_method(cNIO_ByteBuffer, "inspect", NIO_ByteBuffer_inspect, 0);
 }
 
+static const rb_data_type_t NIO_ByteBuffer_type = {
+    "NIO::ByteBuffer",
+    {
+        NULL, // Nothing to mark
+        NIO_ByteBuffer_free,
+        NIO_ByteBuffer_memsize,
+    },
+    0,
+    0,
+    RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED
+};
+
 static VALUE NIO_ByteBuffer_allocate(VALUE klass)
 {
     struct NIO_ByteBuffer *bytebuffer = (struct NIO_ByteBuffer *)xmalloc(sizeof(struct NIO_ByteBuffer));
     bytebuffer->buffer = NULL;
-    return Data_Wrap_Struct(klass, NIO_ByteBuffer_gc_mark, NIO_ByteBuffer_free, bytebuffer);
+    return TypedData_Wrap_Struct(klass, &NIO_ByteBuffer_type, bytebuffer);
 }
 
-static void NIO_ByteBuffer_gc_mark(struct NIO_ByteBuffer *buffer)
+static void NIO_ByteBuffer_free(void *data)
 {
-}
-
-static void NIO_ByteBuffer_free(struct NIO_ByteBuffer *buffer)
-{
+    struct NIO_ByteBuffer *buffer = (struct NIO_ByteBuffer *)data;
     if (buffer->buffer)
         xfree(buffer->buffer);
     xfree(buffer);
 }
 
+static size_t NIO_ByteBuffer_memsize(const void *data)
+{
+    const struct NIO_ByteBuffer *buffer = (const struct NIO_ByteBuffer *)data;
+    size_t memsize = sizeof(struct NIO_ByteBuffer);
+    if (buffer->buffer)
+        memsize += buffer->capacity;
+    return memsize;
+}
+
 static VALUE NIO_ByteBuffer_initialize(VALUE self, VALUE capacity)
 {
     struct NIO_ByteBuffer *buffer;
-    Data_Get_Struct(self, struct NIO_ByteBuffer, buffer);
+    TypedData_Get_Struct(self, struct NIO_ByteBuffer, &NIO_ByteBuffer_type, buffer);
 
     buffer->capacity = NUM2INT(capacity);
     buffer->buffer = xmalloc(buffer->capacity);
@@ -106,7 +144,7 @@ static VALUE NIO_ByteBuffer_initialize(VALUE self, VALUE capacity)
 static VALUE NIO_ByteBuffer_clear(VALUE self)
 {
     struct NIO_ByteBuffer *buffer;
-    Data_Get_Struct(self, struct NIO_ByteBuffer, buffer);
+    TypedData_Get_Struct(self, struct NIO_ByteBuffer, &NIO_ByteBuffer_type, buffer);
 
     memset(buffer->buffer, 0, buffer->capacity);
 
@@ -120,7 +158,7 @@ static VALUE NIO_ByteBuffer_clear(VALUE self)
 static VALUE NIO_ByteBuffer_get_position(VALUE self)
 {
     struct NIO_ByteBuffer *buffer;
-    Data_Get_Struct(self, struct NIO_ByteBuffer, buffer);
+    TypedData_Get_Struct(self, struct NIO_ByteBuffer, &NIO_ByteBuffer_type, buffer);
 
     return INT2NUM(buffer->position);
 }
@@ -129,7 +167,7 @@ static VALUE NIO_ByteBuffer_set_position(VALUE self, VALUE new_position)
 {
     int pos;
     struct NIO_ByteBuffer *buffer;
-    Data_Get_Struct(self, struct NIO_ByteBuffer, buffer);
+    TypedData_Get_Struct(self, struct NIO_ByteBuffer, &NIO_ByteBuffer_type, buffer);
 
     pos = NUM2INT(new_position);
 
@@ -153,7 +191,7 @@ static VALUE NIO_ByteBuffer_set_position(VALUE self, VALUE new_position)
 static VALUE NIO_ByteBuffer_get_limit(VALUE self)
 {
     struct NIO_ByteBuffer *buffer;
-    Data_Get_Struct(self, struct NIO_ByteBuffer, buffer);
+    TypedData_Get_Struct(self, struct NIO_ByteBuffer, &NIO_ByteBuffer_type, buffer);
 
     return INT2NUM(buffer->limit);
 }
@@ -162,7 +200,7 @@ static VALUE NIO_ByteBuffer_set_limit(VALUE self, VALUE new_limit)
 {
     int lim;
     struct NIO_ByteBuffer *buffer;
-    Data_Get_Struct(self, struct NIO_ByteBuffer, buffer);
+    TypedData_Get_Struct(self, struct NIO_ByteBuffer, &NIO_ByteBuffer_type, buffer);
 
     lim = NUM2INT(new_limit);
 
@@ -190,7 +228,7 @@ static VALUE NIO_ByteBuffer_set_limit(VALUE self, VALUE new_limit)
 static VALUE NIO_ByteBuffer_capacity(VALUE self)
 {
     struct NIO_ByteBuffer *buffer;
-    Data_Get_Struct(self, struct NIO_ByteBuffer, buffer);
+    TypedData_Get_Struct(self, struct NIO_ByteBuffer, &NIO_ByteBuffer_type, buffer);
 
     return INT2NUM(buffer->capacity);
 }
@@ -198,7 +236,7 @@ static VALUE NIO_ByteBuffer_capacity(VALUE self)
 static VALUE NIO_ByteBuffer_remaining(VALUE self)
 {
     struct NIO_ByteBuffer *buffer;
-    Data_Get_Struct(self, struct NIO_ByteBuffer, buffer);
+    TypedData_Get_Struct(self, struct NIO_ByteBuffer, &NIO_ByteBuffer_type, buffer);
 
     return INT2NUM(buffer->limit - buffer->position);
 }
@@ -206,7 +244,7 @@ static VALUE NIO_ByteBuffer_remaining(VALUE self)
 static VALUE NIO_ByteBuffer_full(VALUE self)
 {
     struct NIO_ByteBuffer *buffer;
-    Data_Get_Struct(self, struct NIO_ByteBuffer, buffer);
+    TypedData_Get_Struct(self, struct NIO_ByteBuffer, &NIO_ByteBuffer_type, buffer);
 
     return buffer->position == buffer->limit ? Qtrue : Qfalse;
 }
@@ -216,7 +254,7 @@ static VALUE NIO_ByteBuffer_get(int argc, VALUE *argv, VALUE self)
     int len;
     VALUE length, result;
     struct NIO_ByteBuffer *buffer;
-    Data_Get_Struct(self, struct NIO_ByteBuffer, buffer);
+    TypedData_Get_Struct(self, struct NIO_ByteBuffer, &NIO_ByteBuffer_type, buffer);
 
     rb_scan_args(argc, argv, "01", &length);
 
@@ -244,7 +282,7 @@ static VALUE NIO_ByteBuffer_fetch(VALUE self, VALUE index)
 {
     int i;
     struct NIO_ByteBuffer *buffer;
-    Data_Get_Struct(self, struct NIO_ByteBuffer, buffer);
+    TypedData_Get_Struct(self, struct NIO_ByteBuffer, &NIO_ByteBuffer_type, buffer);
 
     i = NUM2INT(index);
 
@@ -263,7 +301,7 @@ static VALUE NIO_ByteBuffer_put(VALUE self, VALUE string)
 {
     long length;
     struct NIO_ByteBuffer *buffer;
-    Data_Get_Struct(self, struct NIO_ByteBuffer, buffer);
+    TypedData_Get_Struct(self, struct NIO_ByteBuffer, &NIO_ByteBuffer_type, buffer);
 
     StringValue(string);
     length = RSTRING_LEN(string);
@@ -281,19 +319,19 @@ static VALUE NIO_ByteBuffer_put(VALUE self, VALUE string)
 static VALUE NIO_ByteBuffer_read_from(VALUE self, VALUE io)
 {
     struct NIO_ByteBuffer *buffer;
-    rb_io_t *fptr;
     ssize_t nbytes, bytes_read;
 
-    Data_Get_Struct(self, struct NIO_ByteBuffer, buffer);
-    GetOpenFile(rb_convert_type(io, T_FILE, "IO", "to_io"), fptr);
-    rb_io_set_nonblock(fptr);
+    TypedData_Get_Struct(self, struct NIO_ByteBuffer, &NIO_ByteBuffer_type, buffer);
+
+    io = rb_convert_type(io, T_FILE, "IO", "to_io");
+    io_set_nonblock(io);
 
     nbytes = buffer->limit - buffer->position;
     if (nbytes == 0) {
         rb_raise(cNIO_ByteBuffer_OverflowError, "buffer is full");
     }
 
-    bytes_read = read(FPTR_TO_FD(fptr), buffer->buffer + buffer->position, nbytes);
+    bytes_read = read(rb_io_descriptor(io), buffer->buffer + buffer->position, nbytes);
 
     if (bytes_read < 0) {
         if (errno == EAGAIN) {
@@ -305,25 +343,24 @@ static VALUE NIO_ByteBuffer_read_from(VALUE self, VALUE io)
 
     buffer->position += bytes_read;
 
-    return INT2NUM(bytes_read);
+    return SIZET2NUM(bytes_read);
 }
 
 static VALUE NIO_ByteBuffer_write_to(VALUE self, VALUE io)
 {
     struct NIO_ByteBuffer *buffer;
-    rb_io_t *fptr;
     ssize_t nbytes, bytes_written;
 
-    Data_Get_Struct(self, struct NIO_ByteBuffer, buffer);
-    GetOpenFile(rb_convert_type(io, T_FILE, "IO", "to_io"), fptr);
-    rb_io_set_nonblock(fptr);
+    TypedData_Get_Struct(self, struct NIO_ByteBuffer, &NIO_ByteBuffer_type, buffer);
+    io = rb_convert_type(io, T_FILE, "IO", "to_io");
+    io_set_nonblock(io);
 
     nbytes = buffer->limit - buffer->position;
     if (nbytes == 0) {
         rb_raise(cNIO_ByteBuffer_UnderflowError, "no data remaining in buffer");
     }
 
-    bytes_written = write(FPTR_TO_FD(fptr), buffer->buffer + buffer->position, nbytes);
+    bytes_written = write(rb_io_descriptor(io), buffer->buffer + buffer->position, nbytes);
 
     if (bytes_written < 0) {
         if (errno == EAGAIN) {
@@ -335,13 +372,13 @@ static VALUE NIO_ByteBuffer_write_to(VALUE self, VALUE io)
 
     buffer->position += bytes_written;
 
-    return INT2NUM(bytes_written);
+    return SIZET2NUM(bytes_written);
 }
 
 static VALUE NIO_ByteBuffer_flip(VALUE self)
 {
     struct NIO_ByteBuffer *buffer;
-    Data_Get_Struct(self, struct NIO_ByteBuffer, buffer);
+    TypedData_Get_Struct(self, struct NIO_ByteBuffer, &NIO_ByteBuffer_type, buffer);
 
     buffer->limit = buffer->position;
     buffer->position = 0;
@@ -353,7 +390,7 @@ static VALUE NIO_ByteBuffer_flip(VALUE self)
 static VALUE NIO_ByteBuffer_rewind(VALUE self)
 {
     struct NIO_ByteBuffer *buffer;
-    Data_Get_Struct(self, struct NIO_ByteBuffer, buffer);
+    TypedData_Get_Struct(self, struct NIO_ByteBuffer, &NIO_ByteBuffer_type, buffer);
 
     buffer->position = 0;
     buffer->mark = MARK_UNSET;
@@ -364,7 +401,7 @@ static VALUE NIO_ByteBuffer_rewind(VALUE self)
 static VALUE NIO_ByteBuffer_mark(VALUE self)
 {
     struct NIO_ByteBuffer *buffer;
-    Data_Get_Struct(self, struct NIO_ByteBuffer, buffer);
+    TypedData_Get_Struct(self, struct NIO_ByteBuffer, &NIO_ByteBuffer_type, buffer);
 
     buffer->mark = buffer->position;
     return self;
@@ -373,7 +410,7 @@ static VALUE NIO_ByteBuffer_mark(VALUE self)
 static VALUE NIO_ByteBuffer_reset(VALUE self)
 {
     struct NIO_ByteBuffer *buffer;
-    Data_Get_Struct(self, struct NIO_ByteBuffer, buffer);
+    TypedData_Get_Struct(self, struct NIO_ByteBuffer, &NIO_ByteBuffer_type, buffer);
 
     if (buffer->mark < 0) {
         rb_raise(cNIO_ByteBuffer_MarkUnsetError, "mark has not been set");
@@ -387,7 +424,7 @@ static VALUE NIO_ByteBuffer_reset(VALUE self)
 static VALUE NIO_ByteBuffer_compact(VALUE self)
 {
     struct NIO_ByteBuffer *buffer;
-    Data_Get_Struct(self, struct NIO_ByteBuffer, buffer);
+    TypedData_Get_Struct(self, struct NIO_ByteBuffer, &NIO_ByteBuffer_type, buffer);
 
     memmove(buffer->buffer, buffer->buffer + buffer->position, buffer->limit - buffer->position);
     buffer->position = buffer->limit - buffer->position;
@@ -400,7 +437,7 @@ static VALUE NIO_ByteBuffer_each(VALUE self)
 {
     int i;
     struct NIO_ByteBuffer *buffer;
-    Data_Get_Struct(self, struct NIO_ByteBuffer, buffer);
+    TypedData_Get_Struct(self, struct NIO_ByteBuffer, &NIO_ByteBuffer_type, buffer);
 
     if (rb_block_given_p()) {
         for (i = 0; i < buffer->limit; i++) {
@@ -416,7 +453,7 @@ static VALUE NIO_ByteBuffer_each(VALUE self)
 static VALUE NIO_ByteBuffer_inspect(VALUE self)
 {
     struct NIO_ByteBuffer *buffer;
-    Data_Get_Struct(self, struct NIO_ByteBuffer, buffer);
+    TypedData_Get_Struct(self, struct NIO_ByteBuffer, &NIO_ByteBuffer_type, buffer);
 
     return rb_sprintf(
         "#<%s:%p @position=%d @limit=%d @capacity=%d>",
