@@ -10,18 +10,19 @@ Build-Depends: debhelper-compat (= 13),
 	       ruby-rspec-retry,
                rake-compiler,
                rubocop
-Standards-Version: 4.6.0
+Standards-Version: 4.7.0
 Vcs-Git: https://salsa.debian.org/ruby-team/ruby-nio4r.git
 Vcs-Browser: https://salsa.debian.org/ruby-team/ruby-nio4r
 Homepage: https://github.com/socketry/nio4r
 Testsuite: autopkgtest-pkg-ruby
 XS-Ruby-Versions: all
+Rules-Requires-Root: no
 
 Package: ruby-nio4r
 Architecture: any
 XB-Ruby-Versions: ${ruby:Versions}
-Depends: ruby | ruby-interpreter,
-         ${misc:Depends},
+Depends: ${misc:Depends},
+         ${ruby:Depends},
          ${shlibs:Depends}
 Description: Ruby library providing a selector API for monitoring IO objects
  nio4r (New IO for Ruby) provides an abstract, cross-platform stateful

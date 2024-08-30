@@ -1,3 +1,51 @@
+## 2.7.2
+
+* Modernize gem (list all authors, etc).
+* Drop official support for Ruby 2.4.
+* Fix JRuby release version.
+
+## 2.7.1
+
+* Fix license specification.
+* Fix JRuby build warnings.
+
+## 2.7.0
+
+* Convert NIO objects to TypedData API.
+
+## 2.6.1
+
+* Don't update `io` which is subsequently stored. Retain the original.
+
+## 2.6.0
+
+* Fix conversion loses int precision.
+* Avoid direct access to IO internals.
+* Resolve issue loading both nio and nio4r gems.
+
+## 2.5.9 (2023-04-02)
+
+https://github.com/socketry/nio4r/compare/v2.5.8..v2.5.9
+
+## 2.5.8 (2021-08-03)
+
+* [#276](https://github.com/socketry/nio4r/pull/276)
+  Fix missing return statement in function returning non-void (issue [#275](https://github.com/socketry/nio4r/pull/275))
+  ([@ioquatix])
+* Remove `guard-rspec` from development dependencies ([@ioquatix])
+
+## 2.5.7 (2021-03-04)
+
+* [#267](https://github.com/socketry/nio4r/pull/267)
+  Don't try to link universal extension
+  ([@ioquatix])
+
+## 2.5.6 (2021-03-04)
+
+* [#268](https://github.com/socketry/nio4r/pull/268)
+  Prefer kqueue when on OSX >= v10.12.2
+  ([@jcmfernandes])
+
 ## 2.5.5 (2021-02-05)
 
 * [#256](https://github.com/socketry/nio4r/pull/256)

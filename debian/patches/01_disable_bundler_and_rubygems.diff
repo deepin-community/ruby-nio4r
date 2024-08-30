@@ -1,12 +1,20 @@
-Description: Disable rubygems and bundler usage
-Author: Sruthi Chandran <srud@disroot.org>
-Forwarded: no
-Last-Update: 2018-05-01
+From: Sruthi Chandran <srud@disroot.org>
+Date: Thu, 8 Aug 2024 22:15:24 -0300
+Subject: Disable rubygems and bundler usage
 
+Forwarded: no
+Last-Update: 2024-08-08
+---
+ ext/nio4r/extconf.rb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ext/nio4r/extconf.rb b/ext/nio4r/extconf.rb
+index b4ae112..e3dce21 100644
 --- a/ext/nio4r/extconf.rb
 +++ b/ext/nio4r/extconf.rb
-@@ -1,6 +1,6 @@
- # frozen_string_literal: true
+@@ -14,7 +14,7 @@
+ # Copyright, 2020, by Joao Fernandes.
+ # Copyright, 2021, by Jeffrey Martin.
  
 -require "rubygems"
 +#require "rubygems"
