@@ -1,3 +1,13 @@
+ruby-nio4r (2.7.4-1) unstable; urgency=medium
+
+  * Team upload.
+  * New upstream release.
+  * Drop {XS,XB}-Ruby-Versions from control.
+  * Update Standards-Version to 4.7.2, no changes needed.
+  * Mark ruby-nio4r as Multi-Arch: same.
+
+ -- Simon Quigley <tsimonq2@debian.org>  Mon, 27 Oct 2025 17:36:37 -0500
+
 ruby-nio4r (2.7.3-1) unstable; urgency=medium
 
   * Team upload.
